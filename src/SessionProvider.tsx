@@ -8,6 +8,7 @@ export const SessionProvider: React.FC<{
   config?: SessionConfig;
   children: React.ReactNode;
 }> = ({ config = {}, children }) => {
+  console.log('config', config)
   const defaultConfig: ResolvedSessionConfig = {
     tenantId: '',
     loginServiceUrl: 'https://login.musafirbiz.com',
@@ -15,7 +16,7 @@ export const SessionProvider: React.FC<{
     storageType: 'memory',
     ...config
   };
-
+  console.log('defaultConfig', defaultConfig)
   const [session, setSession] = useState<SessionData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -27,6 +28,7 @@ export const SessionProvider: React.FC<{
       try {
         if (defaultConfig.storageType !== 'memory') {
           const storedSession = loadSession(defaultConfig.storageType);
+          console.log('storedSession', storedSession)
           if (storedSession) {
             validateToken(storedSession.jwt);
             setSession(storedSession);
@@ -65,7 +67,7 @@ export const SessionProvider: React.FC<{
     try {
       setIsLoading(true);
       const decoded = validateToken(jwt);
-      
+
       const newSession: SessionData = {
         jwt,
         decoded,
@@ -125,10 +127,10 @@ export const SessionProvider: React.FC<{
 
   const redirectToTenant = useCallback(() => {
     if (!session) return;
-    
+
     const tenantUrl = getTenantUrl(session.decoded.tenantId);
     const redirectUrl = `https://${tenantUrl}/login?code=${session.jwt}`;
-    
+
     if (typeof window !== 'undefined') {
       window.location.href = redirectUrl;
     }
